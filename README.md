@@ -1,6 +1,12 @@
 # CMJ Force Plate Dashboard
 ### Víctor Garrido — Ciencias del Deporte · Fuerza y Condicionamiento
 
+## 🚀 [Abrir la aplicación](https://vgarrido1995.github.io/cmj-dashboard/)
+
+> **Accede directo desde el navegador, sin instalar nada:** [https://vgarrido1995.github.io/cmj-dashboard/](https://vgarrido1995.github.io/cmj-dashboard/)
+
+---
+
 Herramienta de monitoreo neuromuscular basada en z-score individual para entrenadores y científicos del deporte.
 
 ## Métricas soportadas
