@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMJ Force Plate Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --navy: #0D1B2A;
+      --teal: #0D9488;
+      --teal-lt: #CCFBF1;
+      --amber: #D97706;
+      --amber-lt: #FEF3C7;
+      --red: #B91C1C;
+      --red-lt: #FEE2E2;
+      --green: #047857;
+      --green-lt: #D1FAE5;
+      --blue: #1D4ED8;
+      --blue-lt: #DBEAFE;
+      --gray-50: #F8FAFC;
+      --gray-100: #F1F5F9;
+      --gray-400: #94A3B8;
+      --gray-700: #334155;
+      --gray-900: #0F172A;
+      --card-bg: #FFFFFF;
+      --border: #E2E8F0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Calibri', 'Segoe UI', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1, h2, h3, .heading { font-family: 'Georgia', serif; }
+
+    /* ── Header ─────────────────────────────── */
+    .app-header {
+      background: var(--navy);
+      color: #fff;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .app-header h1 { font-size: 1.4rem; letter-spacing: 0.5px; }
+    .app-header .subtitle { font-size: 0.85rem; color: var(--gray-400); margin-top: 2px; }
+    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .header-actions button {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      transition: background 0.2s;
+    }
+    .header-actions button:hover { background: rgba(255,255,255,0.2); }
+
+    /* ── Tabs ───────────────────────────────── */
+    .tab-bar {
+      display: flex;
+      background: #fff;
+      border-bottom: 2px solid var(--border);
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: 12px 24px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--gray-400);
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--gray-700); }
+    .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); }
+
+    .tab-content { display: none; padding: 24px; flex: 1; max-width: 1200px; margin: 0 auto; width: 100%; }
+    .tab-content.active { display: block; }
+
+    /* ── Cards ──────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .card h3 { margin-bottom: 12px; font-size: 1.05rem; color: var(--navy); }
+
+    /* ── Forms ──────────────────────────────── */
+    .form-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px; }
+    .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--gray-700); }
+    .form-group input, .form-group select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      background: #fff;
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+    }
+
+    /* ── Buttons ────────────────────────────── */
+    .btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--teal); color: #fff; }
+    .btn-primary:hover { background: #0b7e74; }
+    .btn-secondary { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-danger:hover { background: #991b1b; }
+    .btn-sm { padding: 5px 12px; font-size: 0.8rem; }
+
+    /* ── Toggle ─────────────────────────────── */
+    .toggle-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .toggle {
+      position: relative; width: 44px; height: 24px;
+      background: var(--gray-400); border-radius: 12px;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .toggle.active { background: var(--teal); }
+    .toggle::after {
+      content: '';
+      position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px;
+      background: #fff; border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .toggle.active::after { transform: translateX(20px); }
+
+    /* ── Metric groups ─────────────────────── */
+    .metric-group { margin-bottom: 20px; }
+    .metric-group-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; background: var(--gray-100);
+      border-radius: 8px; cursor: pointer;
+      font-weight: 600; color: var(--navy);
+      user-select: none; margin-bottom: 8px;
+    }
+    .metric-group-header .arrow { transition: transform 0.2s; }
+    .metric-group-header.collapsed .arrow { transform: rotate(-90deg); }
+    .metric-group-body { padding: 0 8px; }
+    .metric-group-body.hidden { display: none; }
+
+    .metric-entry {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid var(--gray-100);
+      flex-wrap: wrap;
+    }
+    .metric-entry:last-child { border-bottom: none; }
+    .metric-label { min-width: 180px; font-weight: 500; font-size: 0.9rem; }
+    .metric-label .unit { color: var(--gray-400); font-size: 0.8rem; }
+    .metric-input-wrap { position: relative; flex: 1; min-width: 180px; }
+    .metric-input-wrap input {
+      width: 100%; padding: 7px 10px; border: 1px solid var(--border);
+      border-radius: 6px; font-size: 0.88rem;
+    }
+    .metric-input-wrap input:focus {
+      outline: none; border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+    }
+    .metric-avg { font-size: 0.8rem; color: var(--teal); margin-top: 2px; min-height: 18px; }
+    .metric-zscore-badge {
+      display: inline-block; padding: 3px 10px;
+      border-radius: 20px; font-size: 0.78rem;
+      font-weight: 600; white-space: nowrap;
+      min-width: 110px; text-align: center;
+    }
+
+    /* ── Semáforo classes ───────────────────── */
+    .z-exceptional  { background: #E6F1FB; color: #185FA5; }
+    .z-above        { background: #EAF3DE; color: #3B6D11; }
+    .z-normal       { background: #F1EFE8; color: #5F5E5A; }
+    .z-mild         { background: #FAEEDA; color: #854F0B; }
+    .z-significant  { background: #FFEDD5; color: #C2410C; }
+    .z-severe       { background: #FEE2E2; color: #991B1B; }
+
+    /* ── Bell curve ────────────────────────── */
+    .bell-controls { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; align-items: flex-end; }
+    .bell-stats { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 16px; }
+    .bell-stat {
+      background: var(--gray-100); padding: 12px 18px; border-radius: 8px;
+      text-align: center; min-width: 120px;
+    }
+    .bell-stat .val { font-size: 1.3rem; font-weight: 700; color: var(--navy); }
+    .bell-stat .lbl { font-size: 0.75rem; color: var(--gray-400); margin-top: 2px; }
+    .slider-wrap { display: flex; flex-direction: column; gap: 4px; min-width: 200px; flex: 1; }
+    .slider-wrap label { font-size: 0.82rem; font-weight: 600; color: var(--gray-700); }
+    .slider-wrap input[type="range"] { width: 100%; accent-color: var(--teal); }
+    .slider-val { font-size: 0.85rem; color: var(--teal); font-weight: 600; }
+
+    /* ── Profile ───────────────────────────── */
+    .profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .profile-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .profile-card h4 { font-size: 0.92rem; color: var(--navy); margin-bottom: 6px; }
+    .profile-card .metric-value { font-size: 1.6rem; font-weight: 700; }
+    .profile-card .metric-z { font-size: 0.82rem; margin-top: 4px; }
+    .profile-card .trend { font-size: 0.78rem; color: var(--gray-400); margin-top: 6px; }
+    .sparkline-container { height: 50px; margin-top: 8px; }
+
+    /* ── Team table ─────────────────────────── */
+    .team-table-wrap { overflow-x: auto; }
+    .team-table {
+      width: 100%; border-collapse: collapse; font-size: 0.85rem;
+    }
+    .team-table th, .team-table td {
+      padding: 10px 12px; text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .team-table th {
+      background: var(--navy); color: #fff;
+      position: sticky; top: 0; z-index: 2;
+      cursor: pointer; user-select: none; white-space: nowrap;
+      font-size: 0.78rem;
+    }
+    .team-table th:hover { background: #162a42; }
+    .team-table td.athlete-name { text-align: left; font-weight: 600; white-space: nowrap; }
+    .team-table .z-cell {
+      border-radius: 6px; font-weight: 600; font-size: 0.82rem;
+      min-width: 60px;
+    }
+    .team-summary {
+      display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap;
+    }
+    .team-summary .summary-item {
+      padding: 12px 20px; border-radius: 8px; text-align: center;
+      font-weight: 700; font-size: 1.1rem; min-width: 100px;
+    }
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .filter-bar .filter-btn {
+      padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border);
+      background: #fff; cursor: pointer; font-size: 0.82rem; font-weight: 500;
+      transition: all 0.2s;
+    }
+    .filter-bar .filter-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+
+    /* ── History table ─────────────────────── */
+    .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .history-table th, .history-table td {
+      padding: 8px 10px; text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .history-table th { background: var(--gray-100); font-weight: 600; white-space: nowrap; }
+
+    /* ── Modal ──────────────────────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4); z-index: 100;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: #fff; border-radius: 12px; padding: 28px;
+      min-width: 340px; max-width: 500px; width: 90%;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    .modal h3 { margin-bottom: 16px; }
+    .modal .form-group { margin-bottom: 12px; }
+    .modal-actions { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
+
+    /* ── Footer ─────────────────────────────── */
+    .app-footer {
+      text-align: center; padding: 16px;
+      font-size: 0.8rem; color: var(--gray-400);
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+
+    /* ── Toast ──────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      padding: 12px 20px; border-radius: 8px;
+      background: var(--navy); color: #fff;
+      font-size: 0.88rem; z-index: 200;
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── Responsive ────────────────────────── */
+    @media (max-width: 768px) {
+      .tab-btn { padding: 10px 14px; font-size: 0.82rem; }
+      .tab-content { padding: 16px; }
+      .form-row { flex-direction: column; }
+      .metric-entry { flex-direction: column; align-items: flex-start; }
+      .bell-controls { flex-direction: column; }
+      .profile-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Helpers ────────────────────────────── */
+    .hidden { display: none !important; }
+    .mb-8 { margin-bottom: 8px; }
+    .mb-16 { margin-bottom: 16px; }
+    .text-muted { color: var(--gray-400); }
+    .text-sm { font-size: 0.82rem; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .gap-8 { gap: 8px; }
+    .description-tooltip {
+      font-size: 0.75rem; color: var(--gray-400);
+      font-style: italic; margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <!-- ═══════ Header ═══════ -->
+  <header class="app-header">
+    <div>
+      <h1>CMJ Force Plate Dashboard</h1>
+      <div class="subtitle">Monitoreo neuromuscular · z-score individual</div>
+    </div>
+    <div class="header-actions">
+      <button onclick="exportFullJSON()" title="Descargar backup completo en JSON">Exportar JSON</button>
+      <button onclick="document.getElementById('importFile').click()" title="Importar backup JSON">Importar JSON</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
+    </div>
+  </header>
+
+  <!-- ═══════ Tab bar ═══════ -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-tab="entry">Ingreso de datos</button>
+    <button class="tab-btn" data-tab="bell">Curva de campana</button>
+    <button class="tab-btn" data-tab="profile">Perfil individual</button>
+    <button class="tab-btn" data-tab="team">Dashboard de equipo</button>
+  </nav>
+
+  <!-- ═══════ Tab 1: Ingreso de datos ═══════ -->
+  <section id="tab-entry" class="tab-content active">
+    <div class="card">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Atleta</label>
+          <select id="entryAthlete" onchange="onEntryAthleteChange()">
+            <option value="">— Seleccionar —</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:0;">
+          <label>&nbsp;</label>
+          <button class="btn btn-secondary" onclick="openNewAthleteModal()">+ Nuevo atleta</button>
+        </div>
+        <div class="form-group" style="max-width:180px;">
+          <label>Fecha de sesión</label>
+          <input type="date" id="entryDate">
+        </div>
+      </div>
+      <div class="toggle-wrap">
+        <div class="toggle active" id="avgToggle" onclick="toggleAverage()"></div>
+        <span class="text-sm">Promediar múltiples valores</span>
+      </div>
+    </div>
+
+    <div id="metricGroups"></div>
+
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="saveSession()">Guardar sesión</button>
+      <button class="btn btn-secondary" onclick="exportCSV()">Exportar CSV</button>
+    </div>
+  </section>
+
+  <!-- ═══════ Tab 2: Curva de campana ═══════ -->
+  <section id="tab-bell" class="tab-content">
+    <div class="card">
+      <h3>Distribución normal — Curva de campana</h3>
+      <div class="bell-controls">
+        <div class="form-group">
+          <label>Atleta</label>
+          <select id="bellAthlete" onchange="updateBell()"></select>
+        </div>
+        <div class="form-group">
+          <label>Métrica</label>
+          <select id="bellMetric" onchange="updateBell()"></select>
+        </div>
+      </div>
+      <canvas id="bellChart" height="280"></canvas>
+      <div class="slider-wrap" style="margin-top:16px;">
+        <label>Explorar hipotético: <span id="sliderVal" class="slider-val"></span></label>
+        <input type="range" id="bellSlider" min="0" max="100" value="50" oninput="onBellSlider()">
+      </div>
+      <div class="bell-stats" id="bellStats"></div>
+    </div>
+  </section>
+
+  <!-- ═══════ Tab 3: Perfil individual ═══════ -->
+  <section id="tab-profile" class="tab-content">
+    <div class="card mb-16">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Atleta</label>
+          <select id="profileAthlete" onchange="updateProfile()"></select>
+        </div>
+      </div>
+    </div>
+    <div class="profile-grid" id="profileGrid"></div>
+    <div class="card" style="margin-top:20px;">
+      <div class="flex-between mb-8">
+        <h3>Historial completo</h3>
+        <div class="form-group" style="max-width:180px;">
+          <input type="date" id="profileDateFilter" onchange="updateProfile()" placeholder="Filtrar fecha">
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="history-table" id="historyTable">
+          <thead><tr id="historyHeader"></tr></thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ Tab 4: Dashboard de equipo ═══════ -->
+  <section id="tab-team" class="tab-content">
+    <div class="card">
+      <h3>Dashboard de equipo</h3>
+      <div class="filter-bar" id="teamFilters">
+        <span class="text-sm" style="font-weight:600;">Grupo:</span>
+        <button class="filter-btn active" data-group="all" onclick="setTeamFilter('all')">Todos</button>
+        <button class="filter-btn" data-group="CMJ" onclick="setTeamFilter('CMJ')">CMJ</button>
+        <button class="filter-btn" data-group="IMTP" onclick="setTeamFilter('IMTP')">IMTP</button>
+        <button class="filter-btn" data-group="RFD" onclick="setTeamFilter('RFD')">RFD</button>
+      </div>
+      <div class="team-table-wrap">
+        <table class="team-table" id="teamTable">
+          <thead><tr id="teamHeader"></tr></thead>
+          <tbody id="teamBody"></tbody>
+        </table>
+      </div>
+      <div class="team-summary" id="teamSummary"></div>
+    </div>
+  </section>
+
+  <!-- ═══════ Modal: Nuevo atleta ═══════ -->
+  <div class="modal-overlay" id="athleteModal">
+    <div class="modal">
+      <h3>Nuevo atleta</h3>
+      <div class="form-group">
+        <label>Nombre completo *</label>
+        <input type="text" id="modalName" placeholder="Ej: Tomás Vega">
+      </div>
+      <div class="form-group">
+        <label>Posición</label>
+        <input type="text" id="modalPosition" placeholder="Ej: Delantero">
+      </div>
+      <div class="form-group">
+        <label>Deporte</label>
+        <input type="text" id="modalSport" placeholder="Ej: Fútbol">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveNewAthlete()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ Toast ═══════ -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ═══════ Footer ═══════ -->
+  <footer class="app-footer">
+    Víctor Garrido · Ciencias del Deporte · Fuerza y Condicionamiento
+  </footer>
+
+<script>
+/* ╔══════════════════════════════════════════════════════════╗
+   ║           CMJ Force Plate Dashboard — App JS            ║
+   ╚══════════════════════════════════════════════════════════╝ */
+
+// ── Métricas ─────────────────────────────────────────────────
+const METRICS = [
+  { id:"cmj_jump_height", label:"Altura del salto", unit:"cm", direction:"high", group:"CMJ",
+    description:"Altura máxima del centro de masa durante el CMJ bilateral" },
+  { id:"cmj_propulsive_impulse", label:"Impulso propulsivo", unit:"N·s", direction:"high", group:"CMJ",
+    description:"Área bajo la curva fuerza-tiempo en la fase propulsiva" },
+  { id:"cmj_rsi_mod", label:"RSI modificado", unit:"m/s", direction:"high", group:"CMJ",
+    description:"Altura salto (m) ÷ tiempo de contracción total (s)" },
+  { id:"cmj_rsi_classic", label:"RSI clásico", unit:"ratio", direction:"high", group:"CMJ",
+    description:"Altura salto ÷ tiempo de contacto" },
+  { id:"cmj_peak_force", label:"Peak force CMJ", unit:"N", direction:"high", group:"CMJ",
+    description:"Fuerza máxima de reacción del suelo durante la fase propulsiva del CMJ" },
+  { id:"imtp_peak_force", label:"IMTP Peak force", unit:"N", direction:"high", group:"IMTP",
+    description:"Fuerza isométrica máxima en el Isometric Mid-Thigh Pull" },
+  { id:"rfd_max", label:"RFD máx", unit:"N/s", direction:"high", group:"RFD",
+    description:"Tasa máxima de desarrollo de fuerza (pico instantáneo)" },
+  { id:"rfd_early", label:"RFD temprana", unit:"N/s", direction:"high", group:"RFD",
+    description:"RFD en la ventana 0–100 ms" },
+  { id:"rfd_late", label:"RFD tardía", unit:"N/s", direction:"high", group:"RFD",
+    description:"RFD en la ventana 100–200 ms" },
+  { id:"rfd_150ms", label:"RFD a 150 ms", unit:"N/s", direction:"high", group:"RFD",
+    description:"Fuerza acumulada dividida en los primeros 150 ms" }
+];
+
+const GROUPS = ["CMJ", "IMTP", "RFD"];
+const STORAGE_KEY = "cmj_dashboard_data";
+
+// ── State ────────────────────────────────────────────────────
+let appData = { version: "1.0", athletes: [] };
+let useAverage = true;
+let teamFilterGroup = "all";
+let teamSortCol = null;
+let teamSortAsc = true;
+let bellChart = null;
+let sparkCharts = {};
+
+// ── Init ─────────────────────────────────────────────────────
+function init() {
+  loadData();
+  setDefaultDate();
+  buildMetricInputs();
+  populateSelectors();
+  setupTabs();
+  updateEntryZScores();
+}
+
+function loadData() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try { appData = JSON.parse(raw); } catch { appData = { version: "1.0", athletes: [] }; }
+  }
+  if (!appData.athletes) appData.athletes = [];
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+}
+
+function setDefaultDate() {
+  document.getElementById("entryDate").value = new Date().toISOString().split("T")[0];
+}
+
+// ── Tabs ─────────────────────────────────────────────────────
+function setupTabs() {
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+      if (btn.dataset.tab === "bell") updateBell();
+      if (btn.dataset.tab === "profile") updateProfile();
+      if (btn.dataset.tab === "team") updateTeam();
+    });
+  });
+}
+
+// ── Selectors ────────────────────────────────────────────────
+function populateSelectors() {
+  const ids = ["entryAthlete", "bellAthlete", "profileAthlete"];
+  ids.forEach(id => {
+    const sel = document.getElementById(id);
+    const current = sel.value;
+    sel.innerHTML = '<option value="">— Seleccionar —</option>';
+    appData.athletes.forEach(a => {
+      const opt = document.createElement("option");
+      opt.value = a.id;
+      opt.textContent = a.name;
+      sel.appendChild(opt);
+    });
+    if (current) sel.value = current;
+  });
+  // Populate bell metric selector
+  const bellMetric = document.getElementById("bellMetric");
+  bellMetric.innerHTML = "";
+  METRICS.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.id;
+    opt.textContent = m.label + " (" + m.unit + ")";
+    bellMetric.appendChild(opt);
+  });
+}
+
+// ── Toggle average ───────────────────────────────────────────
+function toggleAverage() {
+  useAverage = !useAverage;
+  document.getElementById("avgToggle").classList.toggle("active", useAverage);
+  updateEntryZScores();
+}
+
+// ── Metric inputs ────────────────────────────────────────────
+function buildMetricInputs() {
+  const container = document.getElementById("metricGroups");
+  container.innerHTML = "";
+  GROUPS.forEach(group => {
+    const groupMetrics = METRICS.filter(m => m.group === group);
+    const div = document.createElement("div");
+    div.className = "metric-group card";
+    div.innerHTML = `
+      <div class="metric-group-header" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hidden')">
+        <span class="arrow">▼</span> ${group}
+        <span class="text-sm text-muted" style="margin-left:auto;">${groupMetrics.length} métricas</span>
+      </div>
+      <div class="metric-group-body">
+        ${groupMetrics.map(m => `
+          <div class="metric-entry">
+            <div class="metric-label">
+              ${m.label} <span class="unit">(${m.unit})</span>
+              <div class="description-tooltip">${m.description}</div>
+            </div>
+            <div class="metric-input-wrap">
+              <input type="text" id="input_${m.id}" placeholder="Ej: 42.1 ó 42.1, 41.8, 43.0"
+                     oninput="onMetricInput('${m.id}')">
+              <div class="metric-avg" id="avg_${m.id}"></div>
+            </div>
+            <div id="badge_${m.id}"></div>
+          </div>
+        `).join("")}
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+// ── Parse values ─────────────────────────────────────────────
+function parseEntryValues(input) {
+  const vals = input.split(",").map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+  if (vals.length === 0) return null;
+  const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+  return { values: vals, average: parseFloat(avg.toFixed(3)) };
+}
+
+// ── Z-score calc ─────────────────────────────────────────────
+function calcZScore(valueToday, history) {
+  if (history.length < 3) return null;
+  const mean = history.reduce((a, b) => a + b, 0) / history.length;
+  const sd = Math.sqrt(history.reduce((a, b) => a + (b - mean) ** 2, 0) / history.length);
+  if (sd === 0) return null;
+  return (valueToday - mean) / sd;
+}
+
+function interpretZ(z, direction) {
+  if (z === null || z === undefined) return null;
+  const zAdj = direction === "low" ? -z : z;
+  if (zAdj >= 1.5)  return { label:"Excepcional",            color:"#378ADD", bg:"#E6F1FB", level:5, cls:"z-exceptional" };
+  if (zAdj >= 0.5)  return { label:"Por encima del promedio", color:"#639922", bg:"#EAF3DE", level:4, cls:"z-above" };
+  if (zAdj >= -0.9) return { label:"Rango normal",            color:"#888780", bg:"#F1EFE8", level:3, cls:"z-normal" };
+  if (zAdj >= -1.4) return { label:"Leve descenso",           color:"#BA7517", bg:"#FAEEDA", level:2, cls:"z-mild" };
+  if (zAdj >= -1.9) return { label:"Descenso significativo",  color:"#E24B4A", bg:"#FFEDD5", level:1, cls:"z-significant" };
+  return             { label:"Caída severa — acción",         color:"#A32D2D", bg:"#FEE2E2", level:0, cls:"z-severe" };
+}
+
+// ── Metric history ───────────────────────────────────────────
+function getMetricHistory(athlete, metricId, excludeSessionId) {
+  return athlete.sessions
+    .filter(s => s.sessionId !== excludeSessionId && s.metrics[metricId] !== undefined)
+    .map(s => s.metrics[metricId].value);
+}
+
+function getLatestZScore(athlete, metricId) {
+  const sessions = athlete.sessions;
+  if (sessions.length < 2) return null;
+  const latest = sessions[sessions.length - 1];
+  if (!latest.metrics[metricId]) return null;
+  const history = getMetricHistory(athlete, metricId, latest.sessionId);
+  if (history.length < 3) return null;
+  return calcZScore(latest.metrics[metricId].value, history);
+}
+
+// ── Entry: on input ──────────────────────────────────────────
+function onMetricInput(metricId) {
+  const input = document.getElementById("input_" + metricId);
+  const avgEl = document.getElementById("avg_" + metricId);
+  const parsed = parseEntryValues(input.value);
+
+  if (parsed && parsed.values.length > 1 && useAverage) {
+    avgEl.textContent = "Promedio: " + parsed.average;
+  } else {
+    avgEl.textContent = "";
+  }
+  updateEntryZScore(metricId);
+}
+
+function updateEntryZScore(metricId) {
+  const badgeEl = document.getElementById("badge_" + metricId);
+  const input = document.getElementById("input_" + metricId);
+  const athleteId = document.getElementById("entryAthlete").value;
+  badgeEl.innerHTML = "";
+
+  if (!athleteId || !input.value.trim()) return;
+  const athlete = appData.athletes.find(a => a.id === athleteId);
+  if (!athlete) return;
+
+  const parsed = parseEntryValues(input.value);
+  if (!parsed) return;
+
+  const value = (useAverage && parsed.values.length > 1) ? parsed.average : parsed.values[0];
+  const history = getMetricHistory(athlete, metricId);
+  const z = calcZScore(value, history);
+  if (z === null) {
+    badgeEl.innerHTML = '<span class="metric-zscore-badge z-normal">Datos insuf.</span>';
+    return;
+  }
+  const metric = METRICS.find(m => m.id === metricId);
+  const interp = interpretZ(z, metric.direction);
+  badgeEl.innerHTML = `<span class="metric-zscore-badge ${interp.cls}">z = ${z.toFixed(2)} · ${interp.label}</span>`;
+}
+
+function updateEntryZScores() {
+  METRICS.forEach(m => updateEntryZScore(m.id));
+}
+
+function onEntryAthleteChange() {
+  updateEntryZScores();
+}
+
+// ── Save session ─────────────────────────────────────────────
+function saveSession() {
+  const athleteId = document.getElementById("entryAthlete").value;
+  const date = document.getElementById("entryDate").value;
+  if (!athleteId) { showToast("Selecciona un atleta"); return; }
+  if (!date) { showToast("Selecciona una fecha"); return; }
+
+  const athlete = appData.athletes.find(a => a.id === athleteId);
+  if (!athlete) return;
+
+  const metrics = {};
+  let count = 0;
+  METRICS.forEach(m => {
+    const input = document.getElementById("input_" + m.id);
+    if (!input.value.trim()) return;
+    const parsed = parseEntryValues(input.value);
+    if (!parsed) return;
+    const useAvg = useAverage && parsed.values.length > 1;
+    metrics[m.id] = {
+      rawValues: parsed.values,
+      value: useAvg ? parsed.average : parsed.values[0],
+      usedAverage: useAvg
+    };
+    count++;
+  });
+
+  if (count === 0) { showToast("Ingresa al menos una métrica"); return; }
+
+  const session = {
+    date,
+    sessionId: "s_" + Date.now(),
+    metrics
+  };
+  athlete.sessions.push(session);
+  athlete.sessions.sort((a, b) => a.date.localeCompare(b.date));
+  saveData();
+
+  // Clear inputs
+  METRICS.forEach(m => {
+    document.getElementById("input_" + m.id).value = "";
+    document.getElementById("avg_" + m.id).textContent = "";
+    document.getElementById("badge_" + m.id).innerHTML = "";
+  });
+
+  showToast(`Sesión guardada: ${count} métricas para ${athlete.name}`);
+}
+
+// ── New athlete modal ────────────────────────────────────────
+function openNewAthleteModal() {
+  document.getElementById("athleteModal").classList.add("show");
+  document.getElementById("modalName").value = "";
+  document.getElementById("modalPosition").value = "";
+  document.getElementById("modalSport").value = "";
+  document.getElementById("modalName").focus();
+}
+
+function closeModal() {
+  document.getElementById("athleteModal").classList.remove("show");
+}
+
+function saveNewAthlete() {
+  const name = document.getElementById("modalName").value.trim();
+  if (!name) { showToast("El nombre es obligatorio"); return; }
+  const athlete = {
+    id: "a_" + Date.now(),
+    name,
+    position: document.getElementById("modalPosition").value.trim(),
+    sport: document.getElementById("modalSport").value.trim(),
+    createdAt: new Date().toISOString().split("T")[0],
+    sessions: []
+  };
+  appData.athletes.push(athlete);
+  saveData();
+  populateSelectors();
+  document.getElementById("entryAthlete").value = athlete.id;
+  closeModal();
+  showToast("Atleta creado: " + name);
+}
+
+// ── Export CSV ────────────────────────────────────────────────
+function exportCSV() {
+  const athleteId = document.getElementById("entryAthlete").value;
+  if (!athleteId) { showToast("Selecciona un atleta"); return; }
+  const athlete = appData.athletes.find(a => a.id === athleteId);
+  if (!athlete) return;
+  exportAthleteCSV(athlete);
+}
+
+function exportAthleteCSV(athlete) {
+  const metricIds = METRICS.map(m => m.id);
+  const headers = ["Fecha", "Sesión", ...METRICS.map(m => m.label + " (" + m.unit + ")")];
+  const rows = athlete.sessions.map(s => [
+    s.date,
+    s.sessionId,
+    ...metricIds.map(id => s.metrics[id]?.value ?? "")
+  ]);
+  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = athlete.name.replace(/ /g, "_") + "_CMJ_" + new Date().toISOString().split("T")[0] + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── Export / Import JSON ─────────────────────────────────────
+function exportFullJSON() {
+  const json = JSON.stringify(appData, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "cmj_dashboard_backup_" + new Date().toISOString().split("T")[0] + ".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast("Backup JSON exportado");
+}
+
+function handleImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.athletes || !Array.isArray(data.athletes)) throw new Error("Formato inválido: falta array 'athletes'");
+      appData = data;
+      saveData();
+      populateSelectors();
+      showToast("Datos importados: " + appData.athletes.length + " atletas");
+    } catch (err) {
+      showToast("Error al importar: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = "";
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TAB 2: CURVA DE CAMPANA
+// ══════════════════════════════════════════════════════════════
+
+function normalPDF(x, mean, sd) {
+  return (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((x - mean) / sd) ** 2);
+}
+
+function updateBell() {
+  const athleteId = document.getElementById("bellAthlete").value;
+  const metricId = document.getElementById("bellMetric").value;
+  const statsEl = document.getElementById("bellStats");
+
+  if (!athleteId || !metricId) {
+    statsEl.innerHTML = '<div class="text-muted">Selecciona atleta y métrica</div>';
+    if (bellChart) { bellChart.destroy(); bellChart = null; }
+    return;
+  }
+
+  const athlete = appData.athletes.find(a => a.id === athleteId);
+  if (!athlete) return;
+  const metric = METRICS.find(m => m.id === metricId);
+
+  const allValues = getMetricHistory(athlete, metricId);
+  if (allValues.length < 3) {
+    statsEl.innerHTML = '<div class="text-muted">Se necesitan al menos 3 sesiones para generar la curva</div>';
+    if (bellChart) { bellChart.destroy(); bellChart = null; }
+    return;
+  }
+
+  const mean = allValues.reduce((a, b) => a + b, 0) / allValues.length;
+  const sd = Math.sqrt(allValues.reduce((a, b) => a + (b - mean) ** 2, 0) / allValues.length);
+  if (sd === 0) {
+    statsEl.innerHTML = '<div class="text-muted">Sin variabilidad (SD = 0)</div>';
+    if (bellChart) { bellChart.destroy(); bellChart = null; }
+    return;
+  }
+
+  // Latest value
+  const latestSession = athlete.sessions.filter(s => s.metrics[metricId]).slice(-1)[0];
+  let todayVal = latestSession ? latestSession.metrics[metricId].value : mean;
+
+  // Slider
+  const slider = document.getElementById("bellSlider");
+  const sliderMin = mean - 4 * sd;
+  const sliderMax = mean + 4 * sd;
+  slider.min = sliderMin;
+  slider.max = sliderMax;
+  slider.step = (sd / 20).toFixed(4);
+  slider.value = todayVal;
+  document.getElementById("sliderVal").textContent = todayVal.toFixed(2) + " " + metric.unit;
+
+  drawBellChart(mean, sd, todayVal, metric);
+  renderBellStats(mean, sd, todayVal, allValues.length, metric);
+}
+
+function onBellSlider() {
+  const athleteId = document.getElementById("bellAthlete").value;
+  const metricId = document.getElementById("bellMetric").value;
+  if (!athleteId || !metricId) return;
+  const athlete = appData.athletes.find(a => a.id === athleteId);
+  if (!athlete) return;
+  const metric = METRICS.find(m => m.id === metricId);
+  const allValues = getMetricHistory(athlete, metricId);
+  if (allValues.length < 3) return;
+
+  const mean = allValues.reduce((a, b) => a + b, 0) / allValues.length;
+  const sd = Math.sqrt(allValues.reduce((a, b) => a + (b - mean) ** 2, 0) / allValues.length);
+  if (sd === 0) return;
+
+  const val = parseFloat(document.getElementById("bellSlider").value);
+  document.getElementById("sliderVal").textContent = val.toFixed(2) + " " + metric.unit;
+  drawBellChart(mean, sd, val, metric);
+  renderBellStats(mean, sd, val, allValues.length, metric);
+}
+
+function drawBellChart(mean, sd, todayVal, metric) {
+  const ctx = document.getElementById("bellChart").getContext("2d");
+  const xMin = mean - 4 * sd;
+  const xMax = mean + 4 * sd;
+  const step = (xMax - xMin) / 200;
+  const labels = [];
+  const data = [];
+  for (let x = xMin; x <= xMax; x += step) {
+    labels.push(x.toFixed(2));
+    data.push(normalPDF(x, mean, sd));
+  }
+
+  const z = (todayVal - mean) / sd;
+  const interp = interpretZ(z, metric.direction);
+  const pointColor = interp ? interp.color : "#888";
+
+  // Find index closest to todayVal
+  let closestIdx = 0;
+  let minDist = Infinity;
+  labels.forEach((l, i) => {
+    const d = Math.abs(parseFloat(l) - todayVal);
+    if (d < minDist) { minDist = d; closestIdx = i; }
+  });
+
+  const pointData = new Array(labels.length).fill(null);
+  pointData[closestIdx] = data[closestIdx];
+
+  if (bellChart) bellChart.destroy();
+
+  bellChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Distribución",
+          data,
+          borderColor: "rgba(13,148,136,0.7)",
+          backgroundColor: "rgba(13,148,136,0.12)",
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0,
+          borderWidth: 2
+        },
+        {
+          label: "Valor actual",
+          data: pointData,
+          borderColor: pointColor,
+          backgroundColor: pointColor,
+          pointRadius: 10,
+          pointHoverRadius: 13,
+          pointStyle: "circle",
+          showLine: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              if (ctx.datasetIndex === 1) return `Valor: ${todayVal.toFixed(2)} · z = ${z.toFixed(2)}`;
+              return "";
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          display: true,
+          title: { display: true, text: metric.label + " (" + metric.unit + ")" },
+          ticks: { maxTicksLimit: 10, callback: (v, i) => parseFloat(labels[i]).toFixed(1) }
+        },
+        y: {
+          display: true,
+          title: { display: true, text: "Densidad" },
+          ticks: { display: false }
+        }
+      }
+    }
+  });
+}
+
+function renderBellStats(mean, sd, todayVal, n, metric) {
+  const z = (todayVal - mean) / sd;
+  const interp = interpretZ(z, metric.direction);
+  const el = document.getElementById("bellStats");
+  el.innerHTML = `
+    <div class="bell-stat"><div class="val">${mean.toFixed(2)}</div><div class="lbl">Media personal</div></div>
+    <div class="bell-stat"><div class="val">${sd.toFixed(2)}</div><div class="lbl">Desv. estándar</div></div>
+    <div class="bell-stat"><div class="val" style="color:${interp ? interp.color : '#333'}">${z.toFixed(2)}</div><div class="lbl">z-score</div></div>
+    <div class="bell-stat"><div class="val">${n}</div><div class="lbl">Sesiones</div></div>
+    ${interp ? `<div class="bell-stat" style="background:${interp.bg};color:${interp.color}"><div class="val">${interp.label}</div><div class="lbl">Estado</div></div>` : ""}
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TAB 3: PERFIL INDIVIDUAL
+// ══════════════════════════════════════════════════════════════
+
+function updateProfile() {
+  const athleteId = document.getElementById("profileAthlete").value;
+  const grid = document.getElementById("profileGrid");
+  grid.innerHTML = "";
+
+  // Destroy existing sparkline charts
+  Object.values(sparkCharts).forEach(c => c.destroy());
+  sparkCharts = {};
+
+  if (!athleteId) {
+    grid.innerHTML = '<div class="text-muted">Selecciona un atleta</div>';
+    renderHistoryTable(null);
+    return;
+  }
+
+  const athlete = appData.athletes.find(a => a.id === athleteId);
+  if (!athlete || athlete.sessions.length === 0) {
+    grid.innerHTML = '<div class="text-muted">Sin sesiones registradas</div>';
+    renderHistoryTable(athlete);
+    return;
+  }
+
+  const latest = athlete.sessions[athlete.sessions.length - 1];
+
+  METRICS.forEach(m => {
+    const history = getMetricHistory(athlete, m.id);
+    const latestVal = latest.metrics[m.id]?.value;
+    const z = (latestVal !== undefined && history.length >= 3)
+      ? calcZScore(latestVal, history.slice(0, -1).length >= 3 ? getMetricHistory(athlete, m.id, latest.sessionId) : history)
+      : null;
+    // Recalculate properly
+    const histExcluding = getMetricHistory(athlete, m.id, latest.sessionId);
+    const zCalc = (latestVal !== undefined && histExcluding.length >= 3) ? calcZScore(latestVal, histExcluding) : null;
+    const interp = interpretZ(zCalc, m.direction);
+
+    // Last 5 sessions for trend
+    const last5 = athlete.sessions.filter(s => s.metrics[m.id]).slice(-5).map(s => s.metrics[m.id].value);
+    let trendText = "";
+    if (last5.length >= 2) {
+      const diff = last5[last5.length - 1] - last5[0];
+      trendText = (diff >= 0 ? "↑ " : "↓ ") + Math.abs(diff).toFixed(2) + " últimas " + last5.length + " ses.";
+    }
+
+    // Last 10 for sparkline
+    const last10 = athlete.sessions.filter(s => s.metrics[m.id]).slice(-10).map(s => s.metrics[m.id].value);
+
+    const card = document.createElement("div");
+    card.className = "profile-card";
+    card.innerHTML = `
+      <h4>${m.label} <span class="text-muted text-sm">(${m.unit})</span></h4>
+      <div class="metric-value" style="color:${interp ? interp.color : 'var(--navy)'}">
+        ${latestVal !== undefined ? latestVal.toFixed(2) : "—"}
+      </div>
+      ${interp ? `<div class="metric-z"><span class="metric-zscore-badge ${interp.cls}">z = ${zCalc.toFixed(2)} · ${interp.label}</span></div>` : '<div class="metric-z text-muted text-sm">Sin z-score (datos insuf.)</div>'}
+      <div class="trend">${trendText}</div>
+      <div class="sparkline-container"><canvas id="spark_${m.id}"></canvas></div>
+    `;
+    grid.appendChild(card);
+
+    // Draw sparkline
+    if (last10.length >= 2) {
+      requestAnimationFrame(() => {
+        const sparkCtx = document.getElementById("spark_" + m.id);
+        if (!sparkCtx) return;
+        sparkCharts[m.id] = new Chart(sparkCtx.getContext("2d"), {
+          type: "line",
+          data: {
+            labels: last10.map((_, i) => i + 1),
+            datasets: [{
+              data: last10,
+              borderColor: interp ? interp.color : "var(--teal)",
+              backgroundColor: "transparent",
+              borderWidth: 2,
+              pointRadius: 2,
+              tension: 0.3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: { x: { display: false }, y: { display: false } }
+          }
+        });
+      });
+    }
+  });
+
+  renderHistoryTable(athlete);
+}
+
+function renderHistoryTable(athlete) {
+  const header = document.getElementById("historyHeader");
+  const body = document.getElementById("historyBody");
+  header.innerHTML = "";
+  body.innerHTML = "";
+
+  if (!athlete || athlete.sessions.length === 0) return;
+
+  const filterDate = document.getElementById("profileDateFilter").value;
+
+  // Header
+  header.innerHTML = '<th>Fecha</th>' + METRICS.map(m => `<th title="${m.description}">${m.label}</th>`).join("");
+
+  // Rows
+  let sessions = [...athlete.sessions].reverse();
+  if (filterDate) sessions = sessions.filter(s => s.date === filterDate);
+
+  sessions.forEach(s => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${s.date}</td>` + METRICS.map(m => {
+      const v = s.metrics[m.id]?.value;
+      return `<td>${v !== undefined ? v.toFixed(2) : "—"}</td>`;
+    }).join("");
+    body.appendChild(tr);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TAB 4: DASHBOARD DE EQUIPO
+// ══════════════════════════════════════════════════════════════
+
+function setTeamFilter(group) {
+  teamFilterGroup = group;
+  document.querySelectorAll("#teamFilters .filter-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.group === group);
+  });
+  updateTeam();
+}
+
+function updateTeam() {
+  const header = document.getElementById("teamHeader");
+  const body = document.getElementById("teamBody");
+  const summaryEl = document.getElementById("teamSummary");
+  header.innerHTML = "";
+  body.innerHTML = "";
+  summaryEl.innerHTML = "";
+
+  if (appData.athletes.length === 0) {
+    body.innerHTML = '<tr><td colspan="20" class="text-muted">Sin atletas registrados</td></tr>';
+    return;
+  }
+
+  const filteredMetrics = teamFilterGroup === "all"
+    ? METRICS
+    : METRICS.filter(m => m.group === teamFilterGroup);
+
+  // Header
+  header.innerHTML = '<th onclick="sortTeam(\'name\')">Atleta ▼</th>'
+    + filteredMetrics.map(m => `<th onclick="sortTeam('${m.id}')" title="${m.description}">${m.label}</th>`).join("")
+    + '<th onclick="sortTeam(\'avg\')">Promedio ▼</th>';
+
+  // Compute data
+  let rows = appData.athletes.map(athlete => {
+    const latest = athlete.sessions[athlete.sessions.length - 1];
+    const row = { athlete, zScores: {}, avg: null };
+    let zSum = 0, zCount = 0;
+
+    filteredMetrics.forEach(m => {
+      if (!latest || !latest.metrics[m.id]) { row.zScores[m.id] = null; return; }
+      const history = getMetricHistory(athlete, m.id, latest.sessionId);
+      const z = history.length >= 3 ? calcZScore(latest.metrics[m.id].value, history) : null;
+      row.zScores[m.id] = z;
+      if (z !== null) { zSum += z; zCount++; }
+    });
+
+    row.avg = zCount > 0 ? zSum / zCount : null;
+    return row;
+  });
+
+  // Sort
+  if (teamSortCol) {
+    rows.sort((a, b) => {
+      let va, vb;
+      if (teamSortCol === "name") { va = a.athlete.name; vb = b.athlete.name; return teamSortAsc ? va.localeCompare(vb) : vb.localeCompare(va); }
+      if (teamSortCol === "avg") { va = a.avg ?? -999; vb = b.avg ?? -999; }
+      else { va = a.zScores[teamSortCol] ?? -999; vb = b.zScores[teamSortCol] ?? -999; }
+      return teamSortAsc ? va - vb : vb - va;
+    });
+  }
+
+  // Count levels
+  let countGreen = 0, countYellow = 0, countRed = 0;
+
+  rows.forEach(row => {
+    const tr = document.createElement("tr");
+    let cells = `<td class="athlete-name">${escapeHtml(row.athlete.name)}</td>`;
+
+    filteredMetrics.forEach(m => {
+      const z = row.zScores[m.id];
+      if (z === null) {
+        cells += '<td class="z-cell">—</td>';
+      } else {
+        const interp = interpretZ(z, m.direction);
+        cells += `<td class="z-cell" style="background:${interp.bg};color:${interp.color}">${z.toFixed(2)}</td>`;
+      }
+    });
+
+    // Avg column
+    if (row.avg !== null) {
+      const avgInterp = interpretZ(row.avg, "high");
+      cells += `<td class="z-cell" style="background:${avgInterp.bg};color:${avgInterp.color};font-weight:700">${row.avg.toFixed(2)}</td>`;
+      if (avgInterp.level >= 3) countGreen++;
+      else if (avgInterp.level >= 2) countYellow++;
+      else countRed++;
+    } else {
+      cells += '<td class="z-cell">—</td>';
+    }
+
+    tr.innerHTML = cells;
+    body.appendChild(tr);
+  });
+
+  summaryEl.innerHTML = `
+    <div class="summary-item" style="background:var(--green-lt);color:var(--green);">${countGreen} en verde</div>
+    <div class="summary-item" style="background:var(--amber-lt);color:var(--amber);">${countYellow} en amarillo</div>
+    <div class="summary-item" style="background:var(--red-lt);color:var(--red);">${countRed} en rojo</div>
+  `;
+}
+
+function sortTeam(col) {
+  if (teamSortCol === col) teamSortAsc = !teamSortAsc;
+  else { teamSortCol = col; teamSortAsc = true; }
+  updateTeam();
+}
+
+// ── Helpers ──────────────────────────────────────────────────
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+// ── Start ────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

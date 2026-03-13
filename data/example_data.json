@@ -1,0 +1,192 @@
+{
+  "version": "1.0",
+  "athletes": [
+    {
+      "id": "a_demo_001",
+      "name": "Tomás Vega",
+      "position": "Delantero",
+      "sport": "Fútbol",
+      "createdAt": "2025-01-10",
+      "sessions": [
+        {
+          "date": "2025-01-15",
+          "sessionId": "s_001",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [38.2, 37.9, 38.5], "value": 38.2, "usedAverage": true },
+            "cmj_propulsive_impulse": { "rawValues": [245.0], "value": 245.0, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.39], "value": 0.39, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [1820], "value": 1820, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [2650], "value": 2650, "usedAverage": false },
+            "rfd_max": { "rawValues": [8500], "value": 8500, "usedAverage": false }
+          }
+        },
+        {
+          "date": "2025-01-22",
+          "sessionId": "s_002",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [39.1, 38.8, 39.4], "value": 39.1, "usedAverage": true },
+            "cmj_propulsive_impulse": { "rawValues": [251.3], "value": 251.3, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.41], "value": 0.41, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [1855], "value": 1855, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [2700], "value": 2700, "usedAverage": false },
+            "rfd_max": { "rawValues": [8700], "value": 8700, "usedAverage": false }
+          }
+        },
+        {
+          "date": "2025-01-29",
+          "sessionId": "s_003",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [37.5, 38.0], "value": 37.75, "usedAverage": true },
+            "cmj_propulsive_impulse": { "rawValues": [240.8], "value": 240.8, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.38], "value": 0.38, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [1790], "value": 1790, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [2620], "value": 2620, "usedAverage": false },
+            "rfd_max": { "rawValues": [8300], "value": 8300, "usedAverage": false }
+          }
+        },
+        {
+          "date": "2025-02-05",
+          "sessionId": "s_004",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [40.2, 40.5, 39.8], "value": 40.167, "usedAverage": true },
+            "cmj_propulsive_impulse": { "rawValues": [258.1], "value": 258.1, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.43], "value": 0.43, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [1900], "value": 1900, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [2750], "value": 2750, "usedAverage": false },
+            "rfd_max": { "rawValues": [9100], "value": 9100, "usedAverage": false },
+            "rfd_early": { "rawValues": [4200], "value": 4200, "usedAverage": false },
+            "rfd_late": { "rawValues": [5800], "value": 5800, "usedAverage": false }
+          }
+        },
+        {
+          "date": "2025-02-12",
+          "sessionId": "s_005",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [41.0, 40.8, 41.3], "value": 41.033, "usedAverage": true },
+            "cmj_propulsive_impulse": { "rawValues": [262.5], "value": 262.5, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.44], "value": 0.44, "usedAverage": false },
+            "cmj_rsi_classic": { "rawValues": [1.15], "value": 1.15, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [1930], "value": 1930, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [2800], "value": 2800, "usedAverage": false },
+            "rfd_max": { "rawValues": [9300], "value": 9300, "usedAverage": false },
+            "rfd_early": { "rawValues": [4400], "value": 4400, "usedAverage": false },
+            "rfd_late": { "rawValues": [6000], "value": 6000, "usedAverage": false },
+            "rfd_150ms": { "rawValues": [3200], "value": 3200, "usedAverage": false }
+          }
+        }
+      ]
+    },
+    {
+      "id": "a_demo_002",
+      "name": "Lucía Fernández",
+      "position": "Mediocampista",
+      "sport": "Fútbol",
+      "createdAt": "2025-01-10",
+      "sessions": [
+        {
+          "date": "2025-01-15",
+          "sessionId": "s_010",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [32.1], "value": 32.1, "usedAverage": false },
+            "cmj_propulsive_impulse": { "rawValues": [195.0], "value": 195.0, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.34], "value": 0.34, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [1420], "value": 1420, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [2100], "value": 2100, "usedAverage": false }
+          }
+        },
+        {
+          "date": "2025-01-22",
+          "sessionId": "s_011",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [31.5], "value": 31.5, "usedAverage": false },
+            "cmj_propulsive_impulse": { "rawValues": [190.2], "value": 190.2, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.33], "value": 0.33, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [1390], "value": 1390, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [2050], "value": 2050, "usedAverage": false }
+          }
+        },
+        {
+          "date": "2025-01-29",
+          "sessionId": "s_012",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [33.0, 32.8], "value": 32.9, "usedAverage": true },
+            "cmj_propulsive_impulse": { "rawValues": [200.5], "value": 200.5, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.35], "value": 0.35, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [1450], "value": 1450, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [2150], "value": 2150, "usedAverage": false }
+          }
+        },
+        {
+          "date": "2025-02-05",
+          "sessionId": "s_013",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [30.0, 29.5], "value": 29.75, "usedAverage": true },
+            "cmj_propulsive_impulse": { "rawValues": [182.0], "value": 182.0, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.30], "value": 0.30, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [1350], "value": 1350, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [1980], "value": 1980, "usedAverage": false },
+            "rfd_max": { "rawValues": [6200], "value": 6200, "usedAverage": false }
+          }
+        }
+      ]
+    },
+    {
+      "id": "a_demo_003",
+      "name": "Martín Rojas",
+      "position": "Ala",
+      "sport": "Básquetbol",
+      "createdAt": "2025-01-12",
+      "sessions": [
+        {
+          "date": "2025-01-18",
+          "sessionId": "s_020",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [45.0, 44.5, 45.2], "value": 44.9, "usedAverage": true },
+            "cmj_propulsive_impulse": { "rawValues": [310.0], "value": 310.0, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.50], "value": 0.50, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [2200], "value": 2200, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [3100], "value": 3100, "usedAverage": false },
+            "rfd_max": { "rawValues": [11000], "value": 11000, "usedAverage": false }
+          }
+        },
+        {
+          "date": "2025-01-25",
+          "sessionId": "s_021",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [44.2, 44.8], "value": 44.5, "usedAverage": true },
+            "cmj_propulsive_impulse": { "rawValues": [305.0], "value": 305.0, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.48], "value": 0.48, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [2150], "value": 2150, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [3050], "value": 3050, "usedAverage": false },
+            "rfd_max": { "rawValues": [10800], "value": 10800, "usedAverage": false }
+          }
+        },
+        {
+          "date": "2025-02-01",
+          "sessionId": "s_022",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [46.1, 45.9, 46.3], "value": 46.1, "usedAverage": true },
+            "cmj_propulsive_impulse": { "rawValues": [320.0], "value": 320.0, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.52], "value": 0.52, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [2280], "value": 2280, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [3200], "value": 3200, "usedAverage": false },
+            "rfd_max": { "rawValues": [11500], "value": 11500, "usedAverage": false }
+          }
+        },
+        {
+          "date": "2025-02-08",
+          "sessionId": "s_023",
+          "metrics": {
+            "cmj_jump_height": { "rawValues": [43.0, 42.5], "value": 42.75, "usedAverage": true },
+            "cmj_propulsive_impulse": { "rawValues": [290.0], "value": 290.0, "usedAverage": false },
+            "cmj_rsi_mod": { "rawValues": [0.45], "value": 0.45, "usedAverage": false },
+            "cmj_peak_force": { "rawValues": [2050], "value": 2050, "usedAverage": false },
+            "imtp_peak_force": { "rawValues": [2900], "value": 2900, "usedAverage": false },
+            "rfd_max": { "rawValues": [10200], "value": 10200, "usedAverage": false },
+            "rfd_early": { "rawValues": [5100], "value": 5100, "usedAverage": false }
+          }
+        }
+      ]
+    }
+  ]
+}
